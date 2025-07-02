@@ -31,9 +31,6 @@ FizzBuzzGameApi/*.db-wal
 # Rider
 .idea/
 
-# Docker
-**/Dockerfile*
-**/docker-compose*
 
 # OS
 .DS_Store
