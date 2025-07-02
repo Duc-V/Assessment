@@ -1,0 +1,45 @@
+# Node.js
+node_modules/
+.next/
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+fizzbuzz-frontend/node_modules/
+
+# Build output
+fizzbuzz-frontend/.next/
+
+# .NET
+FizzBuzzGameApi/bin/
+FizzBuzzGameApi/obj/
+FizzBuzzGameApi/*.db
+FizzBuzzGameApi/*.db-shm
+FizzBuzzGameApi/*.db-wal
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Docker
+**/Dockerfile*
+**/docker-compose*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.swp
+*.bak
+*.tmp 
