@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeftIcon, PlayIcon, EditIcon } from "lucide-react";
+import { ArrowLeftIcon, PlayIcon} from "lucide-react";
 import { GameDefinitionDto } from "../../../types/GameDefinitionDto";
 import { getGames } from "../../../apis/game/get-games.api";
 import LoadingScreen from "../../../components/LoadingScreen";
@@ -160,13 +160,6 @@ export default function GameDetailPage() {
                 >
                   <PlayIcon className="w-5 h-5" />
                   Play Game
-                </button>
-                <button
-                  onClick={() => router.push(`/score?gameId=${game.id}`)}
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-md transition-colors"
-                >
-                  <EditIcon className="w-5 h-5" />
-                  View Scores
                 </button>
               </div>
             </div>

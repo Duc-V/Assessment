@@ -9,6 +9,11 @@ export async function createGame(dto: CreateGameDto): Promise<GameDefinitionDto>
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(dto),
   });
-  if (!res.ok) throw new Error('Failed to create game');
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || 'Failed to create game');
+  }
+  
   return res.json();
 } 
