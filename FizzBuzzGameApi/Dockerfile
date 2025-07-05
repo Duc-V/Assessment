@@ -1,16 +1,22 @@
-# Build stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["FizzBuzzGameApi.csproj", "./"]
-RUN dotnet restore "./FizzBuzzGameApi.csproj"
+RUN dotnet restore "FizzBuzzGameApi.csproj"
 COPY . .
+WORKDIR "/src"
+RUN dotnet build "FizzBuzzGameApi.csproj" -c Release -o /app/build
+
+FROM build AS publish
 RUN dotnet publish "FizzBuzzGameApi.csproj" -c Release -o /app/publish
 
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM base AS final
 WORKDIR /app
-COPY --from=build /app/publish .
-COPY fizzbuzz.db ./fizzbuzz.db
-EXPOSE 5000
-ENV ASPNETCORE_URLS=http://+:5000
+COPY --from=publish /app/publish .
+# Create database directory and ensure it's writable
+RUN mkdir -p /app/Data && touch /app/Data/fizzbuzz.db && chmod 666 /app/Data/fizzbuzz.db
 ENTRYPOINT ["dotnet", "FizzBuzzGameApi.dll"] 

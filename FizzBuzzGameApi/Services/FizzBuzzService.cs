@@ -8,59 +8,123 @@ namespace FizzBuzzGameApi.Services
     public class FizzBuzzService : IFizzBuzzService
     {
         private readonly FizzBuzzDbContext _db;
-        public FizzBuzzService(FizzBuzzDbContext db) => _db = db;
+
+        public FizzBuzzService(FizzBuzzDbContext db)
+        {
+            _db = db;
+        }
 
         public async Task<List<GameDefinitionDto>> GetGamesAsync()
         {
-            var games = await _db.GameDefinitions.Include(g => g.Rules).ToListAsync();
-            return games.Select(g => new GameDefinitionDto(g)).ToList();
+            try
+            {
+                var games = await _db.GameDefinitions.Include(g => g.Rules).ToListAsync();
+                return games.Select(g => new GameDefinitionDto(g)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to retrieve games from database.", ex);
+            }
         }
 
         public async Task<GameDefinitionDto?> GetGameAsync(int id)
         {
-            var game = await _db.GameDefinitions.Include(g => g.Rules).FirstOrDefaultAsync(g => g.Id == id);
-            return game == null ? null : new GameDefinitionDto(game);
+            try
+            {
+                var game = await _db.GameDefinitions.Include(g => g.Rules).FirstOrDefaultAsync(g => g.Id == id);
+                return game == null ? null : new GameDefinitionDto(game);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to retrieve game with ID {id} from database.", ex);
+            }
         }
 
         public async Task<List<GameRuleDto>> GetGameRulesAsync(int id)
         {
-            var game = await _db.GameDefinitions.Include(g => g.Rules).FirstOrDefaultAsync(g => g.Id == id);
-            return game == null ? new List<GameRuleDto>() : game.Rules.Select(r => new GameRuleDto(r)).ToList();
+            try
+            {
+                var game = await _db.GameDefinitions.Include(g => g.Rules).FirstOrDefaultAsync(g => g.Id == id);
+                return game == null ? new List<GameRuleDto>() : game.Rules.Select(r => new GameRuleDto(r)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to retrieve rules for game with ID {id} from database.", ex);
+            }
         }
 
         public async Task<GameDefinitionDto?> CreateGameAsync(CreateGameDto dto)
         {
-            if (dto.minNumber < 0 || dto.maxNumber < dto.minNumber)
-                throw new ArgumentException("Invalid number range.");
-            if (string.IsNullOrWhiteSpace(dto.name) || string.IsNullOrWhiteSpace(dto.author))
-                throw new ArgumentException("Name and Author are required.");
-            if (dto.rules == null || dto.rules.Count == 0)
-                throw new ArgumentException("At least one rule is required.");
-            if (await _db.GameDefinitions.AnyAsync(g => g.Name == dto.name))
-                throw new InvalidOperationException("Game name must be unique.");
-            var game = new GameDefinition
+            try
             {
-                Name = dto.name,
-                Author = dto.author,
-                MinNumber = dto.minNumber,
-                MaxNumber = dto.maxNumber,
-                Rules = dto.rules.Select(r => new GameRule { Divisor = r.divisor, Word = r.word }).ToList()
-            };
-            _db.GameDefinitions.Add(game);
-            await _db.SaveChangesAsync();
-            return new GameDefinitionDto(game);
+                if (dto.MinNumber < 0 || dto.MaxNumber < dto.MinNumber)
+                {
+                    throw new ArgumentException("Invalid number range.");
+                }
+
+                if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Author))
+                {
+                    throw new ArgumentException("Name and Author are required.");
+                }
+
+                if (dto.Rules == null || dto.Rules.Count == 0)
+                {
+                    throw new ArgumentException("At least one rule is required.");
+                }
+
+                if (await _db.GameDefinitions.AnyAsync(g => g.Name == dto.Name))
+                {
+                    throw new InvalidOperationException("Game name must be unique.");
+                }
+
+                var game = new GameDefinition
+                {
+                    Name = dto.Name,
+                    Author = dto.Author,
+                    MinNumber = dto.MinNumber,
+                    MaxNumber = dto.MaxNumber,
+                    Rules = dto.Rules.Select(r => new GameRule { Divisor = r.Divisor, Word = r.Word }).ToList()
+                };
+
+                _db.GameDefinitions.Add(game);
+                await _db.SaveChangesAsync();
+                return new GameDefinitionDto(game);
+            }
+            catch (ArgumentException)
+            {
+                throw;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to create game in database.", ex);
+            }
         }
 
         public async Task<bool> DeleteGameAsync(int id)
         {
-            var game = await _db.GameDefinitions.Include(g => g.Rules).FirstOrDefaultAsync(g => g.Id == id);
-            if (game == null) return false;
-            var sessions = _db.GameSessions.Where(s => s.GameDefinitionId == id);
-            _db.GameSessions.RemoveRange(sessions);
-            _db.GameRules.RemoveRange(game.Rules);
-            _db.GameDefinitions.Remove(game);
-            await _db.SaveChangesAsync();
-            return true;
+            try
+            {
+                var game = await _db.GameDefinitions.Include(g => g.Rules).FirstOrDefaultAsync(g => g.Id == id);
+                if (game == null)
+                {
+                    return false;
+                }
+
+                var sessions = _db.GameSessions.Where(s => s.GameDefinitionId == id);
+                _db.GameSessions.RemoveRange(sessions);
+                _db.GameRules.RemoveRange(game.Rules);
+                _db.GameDefinitions.Remove(game);
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to delete game with ID {id} from database.", ex);
+            }
         }
     }
 } 
