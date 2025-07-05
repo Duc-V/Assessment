@@ -14,7 +14,7 @@ export default function LoadingScreen({ message = "Loading...", size = "md" }: L
 
   return (
     <div className="flex flex-col items-center justify-center p-8 text-gray-600">
-      <Loader2Icon className={`${sizeClasses[size]} animate-spin mb-2`} />
+      <Loader2Icon data-testid="loader" className={`${sizeClasses[size]} animate-spin mb-2`} />
       <p className="text-sm">{message}</p>
     </div>
   );

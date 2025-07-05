@@ -17,7 +17,8 @@ fizzbuzz-frontend/.next/
 # .NET
 FizzBuzzGameApi/bin/
 FizzBuzzGameApi/obj/
-FizzBuzzGameApi/*.db
+# Allow fizzbuzz.db to be tracked in git for sharing between developers
+# FizzBuzzGameApi/*.db
 FizzBuzzGameApi/*.db-shm
 FizzBuzzGameApi/*.db-wal
 

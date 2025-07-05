@@ -1,14 +1,13 @@
-version: '3.8'
 services:
   backend:
     build:
       context: ./FizzBuzzGameApi
     ports:
       - "5000:5000"
-    volumes:
-      - ./FizzBuzzGameApi/fizzbuzz.db:/app/fizzbuzz.db
     environment:
       - ASPNETCORE_URLS=http://+:5000
+    volumes:
+      - fizzbuzz_data:/app/Data
   frontend:
     build:
       context: ./fizzbuzz-frontend
@@ -17,4 +16,7 @@ services:
     environment:
       - NEXT_PUBLIC_API_BASE=http://backend:5000/api
     depends_on:
-      - backend 
+      - backend
+
+volumes:
+  fizzbuzz_data: 
